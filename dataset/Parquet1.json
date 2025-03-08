@@ -10,7 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "title_crew_flattened.parquet",
 				"fileSystem": "silver"
 			},
 			"compressionCodec": "snappy"
