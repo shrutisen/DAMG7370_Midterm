@@ -1,0 +1,9 @@
+{
+	"name": "MidTermProject-MDB",
+	"location": "southeastasia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "55aa3684-de41-48ce-a48c-4117587327a1",
+		"tenantId": "e24979c9-7762-496b-9a36-a0d110c8d963"
+	}
+}
