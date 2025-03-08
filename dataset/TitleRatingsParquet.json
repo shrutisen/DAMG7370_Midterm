@@ -1,0 +1,20 @@
+{
+	"name": "TitleRatingsParquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ADF_to_ADLS_Ls",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "TitleRatings.parquet",
+				"fileSystem": "silver"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
