@@ -1,0 +1,77 @@
+{
+	"name": "Flatten_Title_Crew",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText1",
+						"type": "DatasetReference"
+					},
+					"name": "TitleCrewCSV"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText2",
+						"type": "DatasetReference"
+					},
+					"name": "ToParquet"
+				}
+			],
+			"transformations": [
+				{
+					"name": "FlattenTitleCrewDirectors"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "FlattenWriters"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          tconst as string,",
+				"          directors as string,",
+				"          writers as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> TitleCrewCSV",
+				"derivedColumn1 foldDown(unroll(directors),",
+				"     mapColumn(",
+				"          directors = directors,",
+				"          tconst,",
+				"          writers",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> FlattenTitleCrewDirectors",
+				"TitleCrewCSV derive(directors = split(directors, ','),",
+				"          writers = split(writers,',')) ~> derivedColumn1",
+				"FlattenTitleCrewDirectors foldDown(unroll(writers),",
+				"     mapColumn(",
+				"          directors,",
+				"          tconst,",
+				"          writers",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> FlattenWriters",
+				"FlattenWriters sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          directors,",
+				"          tconst,",
+				"          writers",
+				"     )) ~> ToParquet"
+			]
+		}
+	}
+}
