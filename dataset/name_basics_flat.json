@@ -1,0 +1,20 @@
+{
+	"name": "name_basics_flat",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ADF_to_ADLS_Ls",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "name_basics_flat",
+				"fileSystem": "silver"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
