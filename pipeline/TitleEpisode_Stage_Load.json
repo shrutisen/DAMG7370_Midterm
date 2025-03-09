@@ -1,9 +1,9 @@
 {
-	"name": "TitleRatings_Stage_Load",
+	"name": "TitleEpisode_Stage_Load",
 	"properties": {
 		"activities": [
 			{
-				"name": "TitleRatings_Csv_to_Parquet",
+				"name": "TitleEpisode_Csv_to_Parquet",
 				"type": "Copy",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
@@ -56,24 +56,36 @@
 							},
 							{
 								"source": {
-									"name": "averageRating",
+									"name": "parentTconst",
 									"type": "String",
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "averageRating",
+									"name": "parentTconst",
 									"type": "String",
 									"physicalType": "UTF8"
 								}
 							},
 							{
 								"source": {
-									"name": "numVotes",
+									"name": "seasonNumber",
 									"type": "String",
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "numVotes",
+									"name": "seasonNumber",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "episodeNumber",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "episodeNumber",
 									"type": "String",
 									"physicalType": "UTF8"
 								}
@@ -88,13 +100,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "TitleRatingscsv",
+						"referenceName": "TitleEpisodeCsv",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "TitleRatingsParquet",
+						"referenceName": "TitleEpisodeParquet",
 						"type": "DatasetReference"
 					}
 				]
@@ -106,7 +118,7 @@
 				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "TitleRatings_Csv_to_Parquet",
+						"activity": "TitleEpisode_Csv_to_Parquet",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -114,7 +126,7 @@
 				],
 				"policy": {
 					"timeout": "0.00:30:00",
-					"retry": 1,
+					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
 					"secureInput": false
@@ -141,7 +153,7 @@
 						],
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
-							"recursive": false,
+							"recursive": true,
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
@@ -177,21 +189,31 @@
 							},
 							{
 								"source": {
-									"name": "averageRating",
+									"name": "parentTconst",
 									"type": "String"
 								},
 								"sink": {
-									"name": "AVERAGERATING",
+									"name": "PARENTTCONST",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "seasonNumber",
+									"type": "String"
+								},
+								"sink": {
+									"name": "SEASONNUMBER",
 									"type": "Int64"
 								}
 							},
 							{
 								"source": {
-									"name": "numVotes",
+									"name": "episodeNumber",
 									"type": "String"
 								},
 								"sink": {
-									"name": "NUMVOTES",
+									"name": "EPISODENUMBER",
 									"type": "Int64"
 								}
 							},
@@ -220,13 +242,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "TitleRatingsParquet",
+						"referenceName": "TitleEpisodeParquet",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "TitleRatingsSnowflake",
+						"referenceName": "TitleEpisodeSnowflake",
 						"type": "DatasetReference"
 					}
 				]
