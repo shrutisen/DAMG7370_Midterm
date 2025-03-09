@@ -1,0 +1,35 @@
+{
+	"name": "Flatten_Title_Basics",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText6",
+						"type": "DatasetReference"
+					},
+					"name": "TitleBasicsSource"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          tconst as string,",
+				"          titleType as string,",
+				"          primaryTitle as string,",
+				"          originalTitle as string,",
+				"          isAdult as integer,",
+				"          startYear as short,",
+				"          endYear as short,",
+				"          runtimeMinutes as integer,",
+				"          genres as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> TitleBasicsSource"
+			]
+		}
+	}
+}
