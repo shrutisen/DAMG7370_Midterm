@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Flattened_Title_Crew",
+				"name": "Flattened_Title_Crew_To_Stage",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
@@ -17,54 +17,19 @@
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "Flatten_Title_Crew",
-						"type": "DataFlowReference"
+						"type": "DataFlowReference",
+						"parameters": {
+							"Job_ID": {
+								"value": "'@{pipeline().RunId}'",
+								"type": "Expression"
+							}
+						}
 					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
 					},
 					"traceLevel": "Fine"
-				}
-			},
-			{
-				"name": "Copy data1",
-				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [
-					{
-						"activity": "Flattened_Title_Crew",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"enableStaging": false
-				}
-			},
-			{
-				"name": "Copy data2",
-				"type": "Copy",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"enableStaging": false
 				}
 			}
 		],
