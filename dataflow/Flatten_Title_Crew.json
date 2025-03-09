@@ -15,10 +15,10 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "DelimitedText2",
+						"referenceName": "SnowflakeTable2",
 						"type": "DatasetReference"
 					},
-					"name": "ToParquet"
+					"name": "ToSnowflake"
 				}
 			],
 			"transformations": [
@@ -30,9 +30,16 @@
 				},
 				{
 					"name": "FlattenWriters"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
+				"parameters{",
+				"     Job_ID as string (\"10\"),",
+				"     Load_DT as date (currentDate())",
+				"}",
 				"source(output(",
 				"          tconst as string,",
 				"          directors as string,",
@@ -59,18 +66,32 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> FlattenWriters",
-				"FlattenWriters sink(allowSchemaDrift: true,",
+				"FlattenWriters derive(DI_LOAD_DT = $Load_DT,",
+				"          DI_JOB_ID = $Job_ID) ~> derivedColumn2",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     umask: 0022,",
-				"     preCommands: [],",
-				"     postCommands: [],",
+				"     input(",
+				"          TCONST as string,",
+				"          DIRECTORS as string,",
+				"          WRITERS as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true,",
 				"     mapColumn(",
-				"          directors,",
-				"          tconst,",
-				"          writers",
-				"     )) ~> ToParquet"
+				"          TCONST = tconst,",
+				"          DIRECTORS = directors,",
+				"          WRITERS = writers,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE = DI_LOAD_DT",
+				"     )) ~> ToSnowflake"
 			]
 		}
 	}
