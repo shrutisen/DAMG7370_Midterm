@@ -12,23 +12,98 @@
 					"name": "TitleBasicsSource"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable4",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "flatten1"
+				},
+				{
+					"name": "derivedColumn2"
+				}
+			],
 			"scriptLines": [
+				"parameters{",
+				"     Job_ID as string ('10'),",
+				"     Job_Date as date (currentDate())",
+				"}",
 				"source(output(",
 				"          tconst as string,",
 				"          titleType as string,",
 				"          primaryTitle as string,",
 				"          originalTitle as string,",
 				"          isAdult as integer,",
-				"          startYear as short,",
-				"          endYear as short,",
+				"          startYear as string,",
+				"          endYear as string,",
 				"          runtimeMinutes as integer,",
 				"          genres as string",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> TitleBasicsSource"
+				"     ignoreNoFilesFound: false) ~> TitleBasicsSource",
+				"TitleBasicsSource derive(genres = split(genres,',')) ~> derivedColumn1",
+				"derivedColumn1 foldDown(unroll(genres),",
+				"     mapColumn(",
+				"          tconst,",
+				"          titleType,",
+				"          primaryTitle,",
+				"          originalTitle,",
+				"          isAdult,",
+				"          startYear,",
+				"          endYear,",
+				"          runtimeMinutes,",
+				"          genres",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 derive(Job_ID = $Job_ID,",
+				"          Job_Date = $Job_Date) ~> derivedColumn2",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          TCONST as string,",
+				"          TITLETYPE as string,",
+				"          PRIMARYTITLE as string,",
+				"          ORIGINALTITLE as string,",
+				"          ISADULT as decimal(38,0),",
+				"          STARTYEAR as decimal(38,0),",
+				"          ENDYEAR as decimal(38,0),",
+				"          RUNTIMEMINUTES as decimal(38,0),",
+				"          GENRES as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          TCONST = tconst,",
+				"          TITLETYPE = titleType,",
+				"          PRIMARYTITLE = primaryTitle,",
+				"          ORIGINALTITLE = originalTitle,",
+				"          ISADULT = isAdult,",
+				"          STARTYEAR = startYear,",
+				"          ENDYEAR = endYear,",
+				"          RUNTIMEMINUTES = runtimeMinutes,",
+				"          GENRES = genres,",
+				"          DI_JOB_ID = Job_ID,",
+				"          DI_LOAD_DATE = Job_Date",
+				"     )) ~> sink1"
 			]
 		}
 	}

@@ -3,8 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "CSV_to_snowflake",
-				"type": "Copy",
+				"name": "Flatten_title_basics",
+				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.00:30:00",
@@ -15,25 +15,23 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
+					"dataflow": {
+						"referenceName": "Flatten_Title_Basics",
+						"type": "DataFlowReference",
+						"parameters": {
+							"Job_ID": {
+								"value": "'@{pipeline().RunId}'",
+								"type": "Expression"
+							},
+							"Job_Date": "currentDate()"
 						}
 					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "DelimitedText5",
-						"type": "DatasetReference"
-					}
-				]
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
 			}
 		],
 		"annotations": []
