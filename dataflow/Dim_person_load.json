@@ -1,0 +1,124 @@
+{
+	"name": "Dim_person_load",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable6",
+						"type": "DatasetReference"
+					},
+					"name": "LoadFromSnowflake"
+				},
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable7",
+						"type": "DatasetReference"
+					},
+					"name": "MaxPersonSK"
+				},
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable8",
+						"type": "DatasetReference"
+					},
+					"name": "SourcePersonDim"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable9",
+						"type": "DatasetReference"
+					},
+					"name": "LoadPersonDimSink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SourceDataWithSK"
+				},
+				{
+					"name": "SurrogateKey"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     Job_ID as string (\"69\")",
+				"}",
+				"source(output(",
+				"          NCONST as string,",
+				"          PRIMARYNAME as string,",
+				"          BIRTHYEAR as string,",
+				"          DEATHYEAR as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     query: '\\nSELECT DISTINCT NCONST,PRIMARYNAME,BIRTHYEAR,DEATHYEAR FROM DAMG_IMDB.NAME_BASICS',",
+				"     format: 'query') ~> LoadFromSnowflake",
+				"source(output(",
+				"          MAXPERSONSK as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     query: 'SELECT NVL(MAX(PERSON_SK),0) AS MaxPersonSK FROM DAMG_IMDB.DIM_PERSON',",
+				"     format: 'query') ~> MaxPersonSK",
+				"source(output(",
+				"          PERSON_SK as decimal(38,0),",
+				"          NCONST as string,",
+				"          PRIMARYNAME as string,",
+				"          BIRTHYEAR as string,",
+				"          DEATHYEAR as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> SourcePersonDim",
+				"LoadFromSnowflake, MaxPersonSK join(1==1,",
+				"     joinType:'cross',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> SourceDataWithSK",
+				"SourceDataWithSK keyGenerate(output(RowNum as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> SurrogateKey",
+				"SurrogateKey derive(PERSON_SK2 = MAXPERSONSK + RowNum,",
+				"          DI_JOB_ID = $Job_ID,",
+				"          DI_LOAD_DATE = currentDate()) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          NCONST as string,",
+				"          PRIMARYNAME as string,",
+				"          PRIMARYPROFESSION as string,",
+				"          KNOWNFORTITLES as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date,",
+				"          BIRTHYEAR as string,",
+				"          DEATHYEAR as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          NCONST,",
+				"          PRIMARYNAME,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE,",
+				"          BIRTHYEAR,",
+				"          DEATHYEAR",
+				"     )) ~> LoadPersonDimSink"
+			]
+		}
+	}
+}
