@@ -5,6 +5,8 @@
 			{
 				"name": "Data flow1",
 				"type": "ExecuteDataFlow",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.01:00:00",
@@ -20,7 +22,8 @@
 						"type": "DataFlowReference",
 						"parameters": {
 							"Job_ID": "$Job_ID1",
-							"Load_Date": "currentDate()"
+							"Load_Date": "currentDate()",
+							"Job_ID1": "'8937265653290531321'"
 						}
 					},
 					"compute": {
