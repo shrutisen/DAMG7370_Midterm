@@ -33,25 +33,33 @@
 					"name": "titleakas"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"name": "sinkBridgelangRegtitle"
+				}
+			],
 			"transformations": [
-				{
-					"name": "select1"
-				},
-				{
-					"name": "join2"
-				},
 				{
 					"name": "join3"
 				},
 				{
-					"name": "select2"
+					"name": "join4"
 				},
 				{
-					"name": "join4"
+					"name": "select3"
+				},
+				{
+					"name": "join5"
+				},
+				{
+					"name": "derivedColumn1"
 				}
 			],
 			"scriptLines": [
+				"parameters{",
+				"     DI_JOB_ID as string (\"34456\"),",
+				"     di_load_date as date (currentDate())",
+				"}",
 				"source(output(",
 				"          LANGUAGE_SK as string,",
 				"          LANGUAGE_NAME as string,",
@@ -103,33 +111,36 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> titleakas",
-				"join3 select(mapColumn(",
-				"          ORDERING,",
-				"          TITLE_SK,",
-				"          ORIGINAL_TITLE",
-				"     ),",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1",
-				"titleakas, dimlanguage join(LANGUAGE == LANGUAGE_CODE,",
-				"     joinType:'inner',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join2",
-				"join4, dimtitle join(TITLEID == TCONST,",
+				"titleakas, dimtitle join(TITLEID == TCONST,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> join3",
-				"join2 select(mapColumn(",
-				"          LANGUAGE_SK",
-				"     ),",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select2",
-				"titleakas, dimregion join(REGION == COUNTRY_CODE,",
+				"join3, dimregion join(REGION == COUNTRY_CODE,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join4"
+				"     broadcast: 'auto')~> join4",
+				"join5 select(mapColumn(",
+				"          ORDERING,",
+				"          TITLE_SK,",
+				"          ORIGINAL_TITLE,",
+				"          REGION_SK,",
+				"          LANGUAGE_SK",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"join4, dimlanguage join(LANGUAGE == LANGUAGE_CODE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join5",
+				"select3 derive(DI_JOB_ID = $DI_JOB_ID,",
+				"          DI_LOAD_DATE = $di_load_date) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkBridgelangRegtitle"
 			]
 		}
 	}
