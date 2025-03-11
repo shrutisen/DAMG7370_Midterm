@@ -125,6 +125,8 @@
 			{
 				"name": "BridgeTableLoad1",
 				"type": "ExecuteDataFlow",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.0:30:00",
@@ -142,6 +144,30 @@
 							"DI_JOB_ID": "\"34456\"",
 							"di_load_date": "currentDate()"
 						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "FactCrewLoad",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.0:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "FactCrew",
+						"type": "DataFlowReference"
 					},
 					"compute": {
 						"coreCount": 8,

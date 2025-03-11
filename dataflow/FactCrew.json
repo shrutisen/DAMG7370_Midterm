@@ -185,7 +185,6 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     stageInsert: true,",
 				"     mapColumn(",
-				"          CREW_SK = CrewSK,",
 				"          PERSON_SK,",
 				"          PERSONROLE_SK,",
 				"          TITLE_SK",
