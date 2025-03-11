@@ -3,11 +3,70 @@
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [],
-			"sinks": [],
-			"transformations": [],
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable8",
+						"type": "DatasetReference"
+					},
+					"name": "sourceDimLanguage"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable9",
+						"type": "DatasetReference"
+					},
+					"name": "sinkDimLanguage"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				}
+			],
 			"scriptLines": [
-				""
+				"parameters{",
+				"     DI_JOB_ID as string (\"16789\"),",
+				"     DI_LOAD_DATE as date (currentDate())",
+				"}",
+				"source(output(",
+				"          LANGUAGESK as decimal(38,0),",
+				"          LANGUAGECODE as string,",
+				"          LANGUAGE as string,",
+				"          DI_JOB_ID as decimal(38,0),",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourceDimLanguage",
+				"sourceDimLanguage derive(DI_JOB_ID = $DI_JOB_ID,",
+				"          DI_LOAD_DATE = $DI_LOAD_DATE) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          LANGUAGE_SK as string,",
+				"          LANGUAGE_NAME as string,",
+				"          LANGUAGE_CODE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          LANGUAGE_SK = LANGUAGESK,",
+				"          LANGUAGE_NAME = LANGUAGE,",
+				"          LANGUAGE_CODE = LANGUAGECODE,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE",
+				"     )) ~> sinkDimLanguage"
 			]
 		}
 	}

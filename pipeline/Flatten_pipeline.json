@@ -1,5 +1,5 @@
 {
-	"name": "pipeline1",
+	"name": "Flatten_pipeline",
 	"properties": {
 		"activities": [
 			{

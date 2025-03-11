@@ -91,6 +91,34 @@
 					},
 					"traceLevel": "Fine"
 				}
+			},
+			{
+				"name": "DimLanguageLoad",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.0:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DimLanguageLoad",
+						"type": "DataFlowReference",
+						"parameters": {
+							"DI_JOB_ID": "\"16789\"",
+							"DI_LOAD_DATE": "currentDate()"
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
 			}
 		],
 		"annotations": []
