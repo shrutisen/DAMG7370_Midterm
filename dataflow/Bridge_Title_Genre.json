@@ -1,5 +1,5 @@
 {
-	"name": "dataflow1",
+	"name": "Bridge_Title_Genre",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {

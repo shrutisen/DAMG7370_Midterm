@@ -1,5 +1,5 @@
 {
-	"name": "pipeline1",
+	"name": "Bridge_Title_Genre_Load",
 	"properties": {
 		"activities": [
 			{
@@ -16,10 +16,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "dataflow1",
+						"referenceName": "Bridge_Title_Genre",
 						"type": "DataFlowReference",
 						"parameters": {
-							"Job_ID": "'10'"
+							"Job_ID": {
+								"value": "'@{pipeline().RunId}'",
+								"type": "Expression"
+							}
 						}
 					},
 					"compute": {
