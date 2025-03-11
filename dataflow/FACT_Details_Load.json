@@ -1,0 +1,186 @@
+{
+	"name": "FACT_Details_Load",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable21",
+						"type": "DatasetReference"
+					},
+					"name": "DimTitleSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable22",
+						"type": "DatasetReference"
+					},
+					"name": "DateDimSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable23",
+						"type": "DatasetReference"
+					},
+					"name": "TitleRatingSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable24",
+						"type": "DatasetReference"
+					},
+					"name": "TitleEpisodeSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable25",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "join3"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "select2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          TITLE_SK as string,",
+				"          TCONST as string,",
+				"          PRIMARY_TITLE as string,",
+				"          ORIGINAL_TITLE as string,",
+				"          TITLE_TYPE as string,",
+				"          IS_ADULT as decimal(38,0),",
+				"          START_YEAR as string,",
+				"          END_YEAR as string,",
+				"          RUNTIME_MINUTES as decimal(38,0),",
+				"          DI_JOB_ID as decimal(38,0),",
+				"          DI_LOAD_DT as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> DimTitleSource",
+				"source(output(",
+				"          YEAR_SK as string,",
+				"          YEAR as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> DateDimSource",
+				"source(output(",
+				"          TCONST as string,",
+				"          AVERAGERATING as decimal(3,1),",
+				"          NUMVOTES as decimal(38,0),",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> TitleRatingSource",
+				"source(output(",
+				"          TCONST as string,",
+				"          PARENTTCONST as string,",
+				"          SEASONNUMBER as decimal(38,0),",
+				"          EPISODENUMBER as decimal(38,0),",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> TitleEpisodeSource",
+				"DimTitleSource, TitleEpisodeSource join(DimTitleSource@TCONST == TitleEpisodeSource@TCONST,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 select(mapColumn(",
+				"          TITLE_SK,",
+				"          TCONST = DimTitleSource@TCONST,",
+				"          TCONST = TitleEpisodeSource@TCONST,",
+				"          PARENTTCONST,",
+				"          SEASONNUMBER,",
+				"          EPISODENUMBER,",
+				"          START_YEAR",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1, DateDimSource join(START_YEAR == YEAR,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"join2, TitleRatingSource join(select1@TCONST == TitleRatingSource@TCONST,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join3",
+				"select2 keyGenerate(output(DETAILS_SK as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"join3 select(mapColumn(",
+				"          TITLE_SK,",
+				"          TCONST = select1@TCONST,",
+				"          PARENTTCONST,",
+				"          SEASONNUMBER,",
+				"          EPISODENUMBER,",
+				"          YEAR_SK,",
+				"          YEAR,",
+				"          TCONST1 = TitleRatingSource@TCONST,",
+				"          AVERAGERATING1 = AVERAGERATING,",
+				"          NUMVOTES1 = NUMVOTES",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"surrogateKey1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          DETAILS_SK as decimal(20,0),",
+				"          RELEASE_YEAR_SK as decimal(10,0),",
+				"          TITLE_SK as decimal(20,0),",
+				"          SEASONNUMBER as decimal(15,0),",
+				"          EPISODENUMBER as decimal(15,0),",
+				"          AVG_RATINGS as decimal(38,0),",
+				"          NUMVOTES as decimal(38,0)",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          SEASONNUMBER,",
+				"          DETAILS_SK,",
+				"          RELEASE_YEAR_SK = YEAR_SK,",
+				"          AVG_RATINGS = AVERAGERATING1,",
+				"          TITLE_SK,",
+				"          EPISODENUMBER,",
+				"          NUMVOTES = NUMVOTES1",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,59 @@
+{
+	"name": "SnowflakeTable25",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Snowflake_IMDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SnowflakeV2Table",
+		"schema": [
+			{
+				"name": "DETAILS_SK",
+				"type": "NUMBER",
+				"precision": 20,
+				"scale": 0
+			},
+			{
+				"name": "RELEASE_YEAR_SK",
+				"type": "NUMBER",
+				"precision": 10,
+				"scale": 0
+			},
+			{
+				"name": "TITLE_SK",
+				"type": "NUMBER",
+				"precision": 20,
+				"scale": 0
+			},
+			{
+				"name": "SEASONNUMBER",
+				"type": "NUMBER",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "EPISODENUMBER",
+				"type": "NUMBER",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "AVG_RATINGS",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "NUMVOTES",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "DAMG_IMDB",
+			"table": "FACT_DETAILS"
+		}
+	}
+}
