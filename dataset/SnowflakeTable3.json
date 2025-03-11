@@ -1,0 +1,33 @@
+{
+	"name": "SnowflakeTable3",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "IMDB_Midterm",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SnowflakeV2Table",
+		"schema": [
+			{
+				"name": "GENRE_SK",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "GENRENAME",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "DI_JOB_ID",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "DI_LOAD_DATE",
+				"type": "DATE"
+			}
+		],
+		"typeProperties": {
+			"schema": "DAMG_IMDB",
+			"table": "DIM_GENRE"
+		}
+	}
+}

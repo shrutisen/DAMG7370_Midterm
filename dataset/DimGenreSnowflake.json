@@ -1,0 +1,16 @@
+{
+	"name": "DimGenreSnowflake",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "IMDB_Midterm",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SnowflakeV2Table",
+		"schema": [],
+		"typeProperties": {
+			"schema": "DAMG_IMDB",
+			"table": "TITLE_BASICS"
+		}
+	}
+}
