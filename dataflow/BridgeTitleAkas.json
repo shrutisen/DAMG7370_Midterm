@@ -35,6 +35,10 @@
 			],
 			"sinks": [
 				{
+					"dataset": {
+						"referenceName": "SnowflakeTable15",
+						"type": "DatasetReference"
+					},
 					"name": "sinkBridgelangRegtitle"
 				}
 			],
@@ -139,8 +143,32 @@
 				"          DI_LOAD_DATE = $di_load_date) ~> derivedColumn1",
 				"derivedColumn1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     input(",
+				"          TITLE_SK as decimal(38,0),",
+				"          REGION_SK as decimal(38,0),",
+				"          LANGUAGE_SK as decimal(38,0),",
+				"          ORDERING as decimal(38,0),",
+				"          ORIGINAL_TITLE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sinkBridgelangRegtitle"
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          TITLE_SK,",
+				"          REGION_SK,",
+				"          LANGUAGE_SK,",
+				"          ORDERING,",
+				"          ORIGINAL_TITLE,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE",
+				"     )) ~> sinkBridgelangRegtitle"
 			]
 		}
 	}
