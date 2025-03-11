@@ -1,0 +1,79 @@
+{
+	"name": "DimRatingsLoad",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "MovieRatings",
+						"type": "DatasetReference"
+					},
+					"name": "LoadFromMovieRatingsSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DimRatings",
+						"type": "DatasetReference"
+					},
+					"name": "sinkDimRatings"
+				}
+			],
+			"transformations": [
+				{
+					"name": "tconstSK"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     di_job_id as string (\"123\"),",
+				"     di_load_Date as date (currentDate())",
+				"}",
+				"source(output(",
+				"          TCONST as string,",
+				"          AVERAGERATING as decimal(3,1),",
+				"          NUMVOTES as decimal(38,0),",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> LoadFromMovieRatingsSource",
+				"LoadFromMovieRatingsSource keyGenerate(output(tConstSK as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> tconstSK",
+				"tconstSK derive(DI_JOB_ID = $di_job_id,",
+				"          DI_LOAD_DATE = $di_load_Date) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          TCONST_SK as string,",
+				"          NUM_VOTES as decimal(38,0),",
+				"          TITLE_RATINGS as decimal(10,0),",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          TCONST_SK = TCONST,",
+				"          NUM_VOTES = NUMVOTES,",
+				"          TITLE_RATINGS = AVERAGERATING,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE",
+				"     )) ~> sinkDimRatings"
+			]
+		}
+	}
+}
