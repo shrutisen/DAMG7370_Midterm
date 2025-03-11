@@ -12,13 +12,34 @@
 					"name": "sourceLanguage"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable7",
+						"type": "DatasetReference"
+					},
+					"name": "sinkLanguage"
+				}
+			],
 			"transformations": [
 				{
-					"name": "flattenLanguage"
+					"name": "splitcolumn"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "flatten1"
 				}
 			],
 			"scriptLines": [
+				"parameters{",
+				"     di_job_id as string (\"789\"),",
+				"     di_load_date as date (currentDate())",
+				"}",
 				"source(output(",
 				"          {ISO Language Names} as string,",
 				"          {Language Codes} as string",
@@ -26,13 +47,45 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> sourceLanguage",
-				"sourceLanguage foldDown(unroll(),",
+				"sourceLanguage derive(languagecode = split({Language Codes}, ','),",
+				"          language = split({ISO Language Names},',')) ~> splitcolumn",
+				"flatten1 derive(DI_JOB_ID = $di_job_id,",
+				"          DI_LOAD_DATE = $di_load_date) ~> derivedColumn1",
+				"derivedColumn1 keyGenerate(output(LanguageSK as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"splitcolumn foldDown(unrollMultiple(languagecode,language),",
 				"     mapColumn(",
-				"          {ISO Language Names},",
-				"          {Language Codes}",
+				"          languagecode,",
+				"          language",
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
-				"     skipDuplicateMapOutputs: false) ~> flattenLanguage"
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"surrogateKey1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          LANGUAGESK as decimal(38,0),",
+				"          ISO_LANGUAGE_NAME as string,",
+				"          LANGUAGECODE as string,",
+				"          LANGUAGE as string,",
+				"          DI_JOB_ID as decimal(38,0),",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          LANGUAGESK = LanguageSK,",
+				"          LANGUAGECODE = languagecode,",
+				"          LANGUAGE = language,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE",
+				"     )) ~> sinkLanguage"
 			]
 		}
 	}
