@@ -1,0 +1,34 @@
+{
+	"name": "FactCrew_Load",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable26",
+						"type": "DatasetReference"
+					},
+					"name": "TitlePrincipalsSource"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          TCONST as string,",
+				"          ORDERING as decimal(38,0),",
+				"          NCONST as string,",
+				"          CATEGORY as string,",
+				"          JOB as string,",
+				"          CHARACTERS as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> TitlePrincipalsSource"
+			]
+		}
+	}
+}
