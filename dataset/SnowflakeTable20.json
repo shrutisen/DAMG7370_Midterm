@@ -1,0 +1,35 @@
+{
+	"name": "SnowflakeTable20",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Snowflake1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SnowflakeV2Table",
+		"schema": [
+			{
+				"name": "CREW_SK",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "PERSON_SK",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "PERSONROLE_SK",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "TITLE_SK",
+				"type": "VARCHAR"
+			}
+		],
+		"typeProperties": {
+			"schema": "DAMG_IMDB",
+			"table": "FACT_CREW"
+		}
+	}
+}
