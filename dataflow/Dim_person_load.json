@@ -6,24 +6,10 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "SnowflakeTable6",
+						"referenceName": "SnowflakeTable11",
 						"type": "DatasetReference"
 					},
 					"name": "LoadFromSnowflake"
-				},
-				{
-					"dataset": {
-						"referenceName": "SnowflakeTable7",
-						"type": "DatasetReference"
-					},
-					"name": "MaxPersonSK"
-				},
-				{
-					"dataset": {
-						"referenceName": "SnowflakeTable8",
-						"type": "DatasetReference"
-					},
-					"name": "SourcePersonDim"
 				}
 			],
 			"sinks": [
@@ -57,25 +43,6 @@
 				"     validateSchema: false,",
 				"     query: '\\nSELECT DISTINCT NCONST,PRIMARYNAME,BIRTHYEAR,DEATHYEAR FROM DAMG_IMDB.NAME_BASICS',",
 				"     format: 'query') ~> LoadFromSnowflake",
-				"source(output(",
-				"          MAXPERSONSK as decimal(38,0)",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     query: 'SELECT NVL(MAX(PERSON_SK),0) AS MaxPersonSK FROM DAMG_IMDB.DIM_PERSON',",
-				"     format: 'query') ~> MaxPersonSK",
-				"source(output(",
-				"          PERSON_SK as decimal(38,0),",
-				"          NCONST as string,",
-				"          PRIMARYNAME as string,",
-				"          BIRTHYEAR as string,",
-				"          DEATHYEAR as string,",
-				"          DI_JOB_ID as string,",
-				"          DI_LOAD_DATE as date",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     format: 'table') ~> SourcePersonDim",
 				"LoadFromSnowflake keyGenerate(output(Person_SK as long),",
 				"     startAt: 1L,",
 				"     stepValue: 1L) ~> SurrogateKey",
