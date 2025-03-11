@@ -1,0 +1,39 @@
+{
+	"name": "flattenLanguage",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText4",
+						"type": "DatasetReference"
+					},
+					"name": "sourceLanguage"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "flattenLanguage"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {ISO Language Names} as string,",
+				"          {Language Codes} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceLanguage",
+				"sourceLanguage foldDown(unroll(),",
+				"     mapColumn(",
+				"          {ISO Language Names},",
+				"          {Language Codes}",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flattenLanguage"
+			]
+		}
+	}
+}
