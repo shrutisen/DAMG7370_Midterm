@@ -29,7 +29,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "SnowflakeTable14",
+						"referenceName": "SnowflakeTable15",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -40,21 +40,35 @@
 					"name": "select1"
 				},
 				{
-					"name": "join1"
-				},
-				{
 					"name": "select2"
 				},
 				{
-					"name": "join2"
+					"name": "select3"
+				},
+				{
+					"name": "join3"
 				},
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select4"
+				},
+				{
+					"name": "join4"
+				},
+				{
+					"name": "derivedColumn3"
 				}
 			],
 			"scriptLines": [
 				"parameters{",
-				"     Job_ID as string ('10')",
+				"     Job_ID as string ('838298635654264132'),",
+				"     Load_Date as date (currentDate()),",
+				"     Job_ID1 as string ('8937265653290531321')",
 				"}",
 				"source(output(",
 				"          GENRE_SK as string,",
@@ -103,24 +117,41 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"select1, select2 join(select1@TCONST == select2@TCONST,",
-				"     joinType:'inner',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1",
 				"TitleSource select(mapColumn(",
 				"          TCONST,",
 				"          GENRES",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select2",
-				"join1, DimGenreSource join(GENRES == GENRE_SK,",
+				"DimGenreSource select(mapColumn(",
+				"          GENRE_SK,",
+				"          GENRENAME",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"derivedColumn1, derivedColumn2 join(Source_Tconst == Dim_Tconst_Trim,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join2",
-				"join2 derive(DI_Job_ID1 = $Job_ID) ~> derivedColumn1",
-				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     broadcast: 'auto')~> join3",
+				"select2 derive(Source_Tconst = lower(trim(TCONST))) ~> derivedColumn1",
+				"select1 derive(Dim_Tconst_Trim = lower(trim(TCONST))) ~> derivedColumn2",
+				"join3 select(mapColumn(",
+				"          TCONST = Source_Tconst,",
+				"          GENRES,",
+				"          Source_Tconst = TITLE_SK,",
+				"          TITLE_SK = Dim_Tconst_Trim",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"select4, select3 join(GENRES == GENRENAME,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join4",
+				"join4 derive(DI_Job_ID = $Job_ID,",
+				"          DI_Load_Date = $Load_Date) ~> derivedColumn3",
+				"derivedColumn3 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          TITLE_SK as string,",
@@ -139,8 +170,8 @@
 				"     mapColumn(",
 				"          TITLE_SK,",
 				"          GENRE_SK,",
-				"          DI_JOB_ID = DI_Job_ID1,",
-				"          DI_LOAD_DT = DI_LOAD_DATE",
+				"          DI_JOB_ID = DI_Job_ID,",
+				"          DI_LOAD_DT = DI_Load_Date",
 				"     )) ~> sink1"
 			]
 		}

@@ -5,11 +5,9 @@
 			{
 				"name": "Data flow1",
 				"type": "ExecuteDataFlow",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "0.00:30:00",
+					"timeout": "0.01:00:00",
 					"retry": 1,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
@@ -21,10 +19,8 @@
 						"referenceName": "Bridge_Title_Genre",
 						"type": "DataFlowReference",
 						"parameters": {
-							"Job_ID": {
-								"value": "'@{pipeline().RunId}'",
-								"type": "Expression"
-							}
+							"Job_ID": "$Job_ID1",
+							"Load_Date": "currentDate()"
 						}
 					},
 					"compute": {
