@@ -1,0 +1,36 @@
+{
+	"name": "imdb_load_pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "DimRatingsLoad",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.0:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DimRatingsLoad",
+						"type": "DataFlowReference",
+						"parameters": {
+							"di_job_id": "\"123\"",
+							"di_load_Date": "currentDate()"
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"annotations": []
+	}
+}
