@@ -35,6 +35,8 @@
 			{
 				"name": "DimProfessionLoad",
 				"type": "ExecuteDataFlow",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.0:30:00",
@@ -51,6 +53,36 @@
 						"parameters": {
 							"DI_JOB_ID": "\"456\"",
 							"DI_LOAD_DATE": "currentDate()"
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "DimRegionLoad",
+				"type": "ExecuteDataFlow",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.0:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DimRegionLoad",
+						"type": "DataFlowReference",
+						"parameters": {
+							"di_job_id": "\"100\"",
+							"di_load_date": "currentDate()"
 						}
 					},
 					"compute": {
