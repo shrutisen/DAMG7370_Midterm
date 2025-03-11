@@ -10,6 +10,20 @@
 						"type": "DatasetReference"
 					},
 					"name": "LoadFromSnowflake"
+				},
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable12",
+						"type": "DatasetReference"
+					},
+					"name": "MaxPersonSK"
+				},
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable13",
+						"type": "DatasetReference"
+					},
+					"name": "SourcePersonDim"
 				}
 			],
 			"sinks": [
@@ -23,10 +37,28 @@
 			],
 			"transformations": [
 				{
-					"name": "SurrogateKey"
+					"name": "derivedColumn1"
 				},
 				{
-					"name": "derivedColumn1"
+					"name": "SourceDataWithSK"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "joinToTarget"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "select2"
 				}
 			],
 			"scriptLines": [
@@ -36,18 +68,80 @@
 				"source(output(",
 				"          NCONST as string,",
 				"          PRIMARYNAME as string,",
+				"          PRIMARYPROFESSION as string,",
+				"          KNOWNFORTITLES as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date,",
 				"          BIRTHYEAR as string,",
 				"          DEATHYEAR as string",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     query: '\\nSELECT DISTINCT NCONST,PRIMARYNAME,BIRTHYEAR,DEATHYEAR FROM DAMG_IMDB.NAME_BASICS',",
-				"     format: 'query') ~> LoadFromSnowflake",
-				"LoadFromSnowflake keyGenerate(output(Person_SK as long),",
+				"     format: 'table') ~> LoadFromSnowflake",
+				"source(output(",
+				"          MAXPERSONSK as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     query: 'SELECT NVL(MAX(Person_SK),0) AS MaxPersonSK FROM DAMG_IMDB.DIM_PERSON',",
+				"     format: 'query') ~> MaxPersonSK",
+				"source(output(",
+				"          PERSON_SK as decimal(38,0),",
+				"          NCONST as string,",
+				"          PRIMARYNAME as string,",
+				"          BIRTHYEAR as string,",
+				"          DEATHYEAR as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> SourcePersonDim",
+				"surrogateKey1 derive(DI_JOB_ID = $Job_ID,",
+				"          DI_LOAD_DATE = currentDate(),",
+				"          Person_SK = MAXPERSONSK + RowNum) ~> derivedColumn1",
+				"LoadFromSnowflake, MaxPersonSK join(1==1,",
+				"     joinType:'cross',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> SourceDataWithSK",
+				"SourceDataWithSK select(mapColumn(",
+				"          NCONST,",
+				"          PRIMARYNAME,",
+				"          BIRTHYEAR,",
+				"          DEATHYEAR,",
+				"          MAXPERSONSK",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 aggregate(groupBy(NCONST,",
+				"          PRIMARYNAME,",
+				"          BIRTHYEAR,",
+				"          DEATHYEAR,",
+				"          MAXPERSONSK),",
+				"     COUNT_ROW = count(NCONST)) ~> aggregate1",
+				"aggregate1, SourcePersonDim join(aggregate1@NCONST == SourcePersonDim@NCONST",
+				"     && aggregate1@PRIMARYNAME == SourcePersonDim@PRIMARYNAME",
+				"     && aggregate1@BIRTHYEAR == SourcePersonDim@BIRTHYEAR",
+				"     && aggregate1@DEATHYEAR == SourcePersonDim@DEATHYEAR,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinToTarget",
+				"joinToTarget filter(isNull(SourcePersonDim@NCONST)&&isNull(SourcePersonDim@PRIMARYNAME)&&isNull(SourcePersonDim@BIRTHYEAR)&&isNull(SourcePersonDim@DEATHYEAR)) ~> filter1",
+				"select2 keyGenerate(output(RowNum as long),",
 				"     startAt: 1L,",
-				"     stepValue: 1L) ~> SurrogateKey",
-				"SurrogateKey derive(DI_JOB_ID = $Job_ID,",
-				"          DI_LOAD_DATE = currentDate()) ~> derivedColumn1",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"filter1 select(mapColumn(",
+				"          NCONST = aggregate1@NCONST,",
+				"          PRIMARYNAME = aggregate1@PRIMARYNAME,",
+				"          BIRTHYEAR = aggregate1@BIRTHYEAR,",
+				"          DEATHYEAR = aggregate1@DEATHYEAR,",
+				"          MAXPERSONSK,",
+				"          COUNT_ROW",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
 				"derivedColumn1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
