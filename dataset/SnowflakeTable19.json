@@ -1,0 +1,51 @@
+{
+	"name": "SnowflakeTable19",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Snowflake1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SnowflakeV2Table",
+		"schema": [
+			{
+				"name": "TCONST",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "ORDERING",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "NCONST",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "CATEGORY",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "JOB",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "CHARACTERS",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "DI_JOB_ID",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "DI_LOAD_DATE",
+				"type": "DATE"
+			}
+		],
+		"typeProperties": {
+			"schema": "DAMG_IMDB",
+			"table": "TITLE_PRINCIPALS"
+		}
+	}
+}
