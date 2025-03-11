@@ -29,9 +29,6 @@
 					"name": "FlattenPrimaryProfession"
 				},
 				{
-					"name": "FlattenKnowForTitles"
-				},
-				{
 					"name": "derivedColumn2"
 				}
 			],
@@ -51,8 +48,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> NameBasicsTsv",
-				"NameBasicsTsv derive(primaryProfession = split(primaryProfession, ','),",
-				"          knownForTitles = split(knownForTitles, ',')) ~> derivedColumn1",
+				"NameBasicsTsv derive(primaryProfession = split(primaryProfession, ',')) ~> derivedColumn1",
 				"derivedColumn1 foldDown(unroll(primaryProfession),",
 				"     mapColumn(",
 				"          nconst,",
@@ -64,18 +60,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> FlattenPrimaryProfession",
-				"FlattenPrimaryProfession foldDown(unroll(knownForTitles),",
-				"     mapColumn(",
-				"          nconst,",
-				"          primaryName,",
-				"          birthYear,",
-				"          deathYear,",
-				"          primaryProfession,",
-				"          knownForTitles",
-				"     ),",
-				"     skipDuplicateMapInputs: false,",
-				"     skipDuplicateMapOutputs: false) ~> FlattenKnowForTitles",
-				"FlattenKnowForTitles derive(DI_JOB_ID = $Job_ID,",
+				"FlattenPrimaryProfession derive(DI_JOB_ID = $Job_ID,",
 				"          DI_LOAD_DATE = $Load_Date) ~> derivedColumn2",
 				"derivedColumn2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
