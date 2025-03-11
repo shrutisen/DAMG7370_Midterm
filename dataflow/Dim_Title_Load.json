@@ -1,0 +1,108 @@
+{
+	"name": "Dim_Title_Load",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable18",
+						"type": "DatasetReference"
+					},
+					"name": "TitleBasicsLoad"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable20",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     Job_ID as string (\"80\")",
+				"}",
+				"source(output(",
+				"          TCONST as string,",
+				"          TITLETYPE as string,",
+				"          PRIMARYTITLE as string,",
+				"          ORIGINALTITLE as string,",
+				"          ISADULT as decimal(38,0),",
+				"          STARTYEAR as string,",
+				"          ENDYEAR as string,",
+				"          RUNTIMEMINUTES as decimal(38,0),",
+				"          GENRES as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> TitleBasicsLoad",
+				"TitleBasicsLoad aggregate(groupBy(TCONST,",
+				"          TITLETYPE,",
+				"          PRIMARYTITLE,",
+				"          ORIGINALTITLE,",
+				"          ISADULT,",
+				"          STARTYEAR,",
+				"          ENDYEAR,",
+				"          RUNTIMEMINUTES),",
+				"     COUNT_ROW = count(TCONST)) ~> aggregate1",
+				"aggregate1 keyGenerate(output(Title_SK as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"surrogateKey1 derive(DI_JOB_ID = $Job_ID,",
+				"          DI_LOAD_DATE = currentDate()) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          TITLE_SK as string,",
+				"          TCONST as string,",
+				"          PRIMARY_TITLE as string,",
+				"          ORIGINAL_TITLE as string,",
+				"          TITLE_TYPE as string,",
+				"          IS_ADULT as decimal(38,0),",
+				"          START_YEAR as string,",
+				"          END_YEAR as string,",
+				"          RUNTIME_MINUTES as decimal(38,0),",
+				"          DI_JOB_ID as decimal(38,0),",
+				"          DI_LOAD_DT as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          TITLE_SK = Title_SK,",
+				"          TCONST,",
+				"          PRIMARY_TITLE = PRIMARYTITLE,",
+				"          ORIGINAL_TITLE = ORIGINALTITLE,",
+				"          TITLE_TYPE = TITLETYPE,",
+				"          IS_ADULT = ISADULT,",
+				"          START_YEAR = STARTYEAR,",
+				"          END_YEAR = ENDYEAR,",
+				"          RUNTIME_MINUTES = RUNTIMEMINUTES,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DT = DI_LOAD_DATE",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
