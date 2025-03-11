@@ -39,13 +39,13 @@
 					"name": "join1"
 				},
 				{
-					"name": "join2"
-				},
-				{
 					"name": "join3"
 				},
 				{
 					"name": "select1"
+				},
+				{
+					"name": "select2"
 				}
 			],
 			"scriptLines": [
@@ -105,12 +105,7 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> join1",
-				"join1, sourcePersonRole join(sourcePrincipals@CATEGORY == sourcePersonRole@CATEGORY,",
-				"     joinType:'inner',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join2",
-				"join2, sourceDimTitle join(sourcePrincipals@TCONST == sourceDimTitle@TCONST,",
+				"select2, sourceDimTitle join(select2@TCONST == sourceDimTitle@TCONST,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -121,7 +116,16 @@
 				"          TITLE_SK",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1"
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"join1 select(mapColumn(",
+				"          PERSON_SK,",
+				"          NCONST = sourcePerson@NCONST,",
+				"          TCONST,",
+				"          CATEGORY,",
+				"          CHARACTERS",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2"
 			]
 		}
 	}
