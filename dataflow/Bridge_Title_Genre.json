@@ -168,7 +168,7 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     stageInsert: true,",
 				"     mapColumn(",
-				"          TITLE_SK,",
+				"          TITLE_SK = Source_Tconst,",
 				"          GENRE_SK,",
 				"          DI_JOB_ID = DI_Job_ID,",
 				"          DI_LOAD_DT = DI_Load_Date",
