@@ -125,8 +125,6 @@
 			{
 				"name": "BridgeTableLoad1",
 				"type": "ExecuteDataFlow",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.0:30:00",
@@ -155,6 +153,8 @@
 			{
 				"name": "FactCrewLoad",
 				"type": "ExecuteDataFlow",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.0:30:00",
