@@ -1,4 +1,4 @@
-# 📌 IMDb Data Profiling - Data Engineering Project
+# IMDb Data Profiling - Data Engineering Project
 ---
 ## 📖 Project Overview
 This project involves **end-to-end data processing** of IMDb datasets, leveraging **Azure, Snowflake, Python, and Alteryx** for data ingestion, cleaning, modeling, and visualization.
