@@ -16,7 +16,7 @@ This project involves **end-to-end data processing** of IMDb datasets, leveragin
 
 ## 🏗 End-to-End Data Processing Pipeline
 ### 🔹 **1. Data Ingestion (Medallion Architecture)**
-- **Raw Data (Bronze Layer):** Stored in Azure Blob Storage.
+- **Raw Data (Bronze Layer):** Stored in Azure Data Lake Storage.
 - **Processed Data (Silver Layer):** Converted to **Parquet format** for optimized storage.
 - **Final Data (Gold Layer):** Loaded into **Snowflake** for transformations & reporting.
 
