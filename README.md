@@ -5,7 +5,7 @@ This project involves **end-to-end data processing** of IMDb datasets, leveragin
 ---
 
 ## 🛠 Technology Stack
-- **Cloud Storage:** 🌩 **Azure Blob Storage**
+- **Cloud Storage:** 🌩 **Azure Data Lake Storage**
 - **Data Processing:** 🐍 **Python, Alteryx**
 - **Data Modeling:** 🏗 **ER Studio**
 - **Data Warehouse:** ❄ **Snowflake**
